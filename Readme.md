@@ -9,7 +9,9 @@
     > O usuário envia o token previamente enviado para validação.
 
 ### Documentacao
-[Flow.md](Flow.md)
+1. [Flow.md](Flow.md) - Fluxo da aplicacao
+2. [Schemas.md](Schemas.md) - Esquemas das entidades usadas
+
 
 ### Hash da Senha
 Não é possível armazenar os dados dois usuários quaisquer no banco de dados, pois em caso de bazamento de dados, qualquer pessoa teria acesso a informações sensíveis sobre o usuário. Portanto, os dados primeiro passam por uma função.
