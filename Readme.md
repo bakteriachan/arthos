@@ -2,16 +2,17 @@
 
 ## Funções Principais
 - Registrar usuários
-> Utilizando um banco de dados, onde a senha será armazenada criptografada (hash).
+    > Utilizando um banco de dados, onde a senha será armazenada criptografada (hash).
 - Autorizar usuários
-> O usuário envia seu (e-mail, senha) e o serviço valida esses dados comparando-os com o banco de dados, respondendo com um JWT.
+    > O usuário envia seu (e-mail, senha) e o serviço valida esses dados comparando-os com o banco de dados, respondendo com um JWT.
 - Validar Tokens
-> O usuário envia o token previamente enviado para validação.
+    > O usuário envia o token previamente enviado para validação.
 
 ### Hash da Senha
-Não é possível armazenar dois usuários quaisquer no banco de dados, pois em caso de perda de dados, qualquer pessoa teria acesso a informações sensíveis sobre o usuário. Portanto, os dados primeiro passam por uma função.
+Não é possível armazenar os dados dois usuários quaisquer no banco de dados, pois em caso de bazamento de dados, qualquer pessoa teria acesso a informações sensíveis sobre o usuário. Portanto, os dados primeiro passam por uma função.
 
-``` senha = F(senha)
+```
+senha = F(senha)
 ```
 A função selecionada deve ser forte o suficiente para que não seja possível saber qual era a senha original. Existem diversos pacotes que garantem isso, como o bcrypt, por exemplo.
 
