@@ -2,6 +2,7 @@ import express from 'express'
 import { ClientRouter } from './clients/clients.router.js'
 import { connect } from './database.js'
 import { ErrorsMiddleware } from './middlewares/errors.js'
+import { UsersRouter } from './users/users.router.js'
 
 const PORT = process.env.PORT || 3000
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017'
@@ -10,6 +11,7 @@ const app = express()
 app.use(express.json())
 
 app.use('/client', ClientRouter)
+app.use('/user', UsersRouter)
 
 app.use(ErrorsMiddleware)
 

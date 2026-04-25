@@ -1,6 +1,16 @@
-export function ErrorsMiddleware(next, req, res, error) {
+import { HttpException } from "../shared/errors.js"
+
+export function ErrorsMiddleware(error, req, res, next) {
     if(error) {
-        return res.status(500).json({ statusCode: 500, message: 'Internal Server Error' })
+        console.error(error)
+        const response = {
+            statusCode: error.statusCode ?? 500,
+            message: error.message ?? "Internal Server Error"
+        }
+        if(error instanceof HttpException) {
+            response.name = error.constructor.name
+        }
+        return res.status(response.statusCode).json(response)
     }
     next()
 }

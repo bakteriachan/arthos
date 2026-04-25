@@ -10,7 +10,7 @@ services:
       - ./:/app
     depends_on:
       - mongo
-    command: ["npm", "run", "start"]
+    command: ["npm", "run", "dev"]
   mongo:
     image: mongo:7.0
     environment:
