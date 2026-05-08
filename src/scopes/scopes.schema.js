@@ -6,4 +6,6 @@ export const Scope = new Schema({
     clientId: { type: String, required: true },
 })
 
+Scope.index({ value: 1, clientId: 1 }, { unique: true })
+
 export const ScopeModel = model('Scope', Scope)

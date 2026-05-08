@@ -1,12 +1,13 @@
 import { BadRequestException } from "../shared/errors.js"
-import { ClientAlreadyExistsException } from "./clients.errors.js"
+import { ClientAlreadyExistsException, ClientNotFoundException } from "./clients.errors.js"
 import { ClientModel } from "./clients.schema.js"
 import { Types } from "mongoose"
 import { v4 as uuidv4 } from 'uuid'
+import { validateDto } from "../shared/util.js"
 
 export default {
     getByClientId: async function (clientId) {
-        if(!clientId) throw new BadRequestException()
+        validateDto({ clientId }, ['clientId'])
         const client = await ClientModel.findOne({
             clientId
         })
@@ -17,6 +18,7 @@ export default {
     },
     create: async function (dto) {
         if(!dto) throw new BadRequestException()
+        validateDto(dto, ['email', 'name'])
         const {
             email,
             name,
@@ -24,9 +26,6 @@ export default {
 
         const clientId = new Types.ObjectId().toString()
         const clientSecret = uuidv4()
-
-        if(!email) throw new BadRequestException("Missing client email")
-        if(!name) throw new BadRequestException("Missing client name")
 
         const exists = await ClientModel.findOne({ email: email.toLowerCase() })
         if(exists) throw new ClientAlreadyExistsException(email)

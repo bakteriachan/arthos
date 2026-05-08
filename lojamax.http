@@ -1,0 +1,256 @@
+@baseUrl = http://localhost:3000
+
+### ─────────────────────────────────────────
+### 1. Registrar LojaMax
+### ─────────────────────────────────────────
+
+# @name registrarCliente
+POST {{baseUrl}}/client
+Content-Type: application/json
+
+{
+  "name": "LojaMax",
+  "email": "tech@lojamax.com"
+}
+
+### ─────────────────────────────────────────
+### 2. Criar scopes
+### ─────────────────────────────────────────
+
+POST {{baseUrl}}/scope
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Ver pedidos",
+  "value": "read:orders"
+}
+
+###
+
+POST {{baseUrl}}/scope
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Gerenciar pedidos",
+  "value": "write:orders"
+}
+
+###
+
+POST {{baseUrl}}/scope
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Ver catálogo",
+  "value": "read:products"
+}
+
+###
+
+POST {{baseUrl}}/scope
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Editar catálogo",
+  "value": "write:products"
+}
+
+###
+
+POST {{baseUrl}}/scope
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Administrar funcionários",
+  "value": "admin:users"
+}
+
+### ─────────────────────────────────────────
+### 3. Criar recursos protegidos
+### ─────────────────────────────────────────
+
+POST {{baseUrl}}/resource
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "orders-api",
+  "requiredScopes": ["read:orders"]
+}
+
+###
+
+POST {{baseUrl}}/resource
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "products-api",
+  "requiredScopes": ["read:products"]
+}
+
+###
+
+POST {{baseUrl}}/resource
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "admin-panel",
+  "requiredScopes": ["admin:users"]
+}
+
+### ─────────────────────────────────────────
+### 4. Registrar funcionários
+### ─────────────────────────────────────────
+
+POST {{baseUrl}}/user
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Ana García",
+  "email": "ana@lojamax.com",
+  "password": "ana_secret",
+  "scopes": ["read:orders", "write:orders", "read:products", "write:products", "admin:users"]
+}
+
+###
+
+POST {{baseUrl}}/user
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Ruiz",
+  "email": "carlos@lojamax.com",
+  "password": "carlos_secret",
+  "scopes": ["read:products", "write:products"]
+}
+
+### ─────────────────────────────────────────
+### 5. Login
+### ─────────────────────────────────────────
+
+# @name loginAna
+POST {{baseUrl}}/auth/login
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "email": "ana@lojamax.com",
+  "password": "ana_secret"
+}
+
+###
+
+# @name loginCarlos
+POST {{baseUrl}}/auth/login
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+Content-Type: application/json
+
+{
+  "email": "carlos@lojamax.com",
+  "password": "carlos_secret"
+}
+
+### ─────────────────────────────────────────
+### 6. Validar acesso — Ana (gerente)
+### ─────────────────────────────────────────
+
+# Ana → admin-panel → 200 concedido
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{loginAna.response.body.token}}
+Content-Type: application/json
+
+{
+  "resourceName": "admin-panel"
+}
+
+###
+
+# Ana → orders-api → 200 concedido
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{loginAna.response.body.token}}
+Content-Type: application/json
+
+{
+  "resourceName": "orders-api"
+}
+
+###
+
+# Ana → products-api → 200 concedido
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{loginAna.response.body.token}}
+Content-Type: application/json
+
+{
+  "resourceName": "products-api"
+}
+
+### ─────────────────────────────────────────
+### 7. Validar acesso — Carlos (estoque)
+### ─────────────────────────────────────────
+
+# Carlos → products-api → 200 concedido
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{loginCarlos.response.body.token}}
+Content-Type: application/json
+
+{
+  "resourceName": "products-api"
+}
+
+###
+
+# Carlos → admin-panel → 403 negado
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{loginCarlos.response.body.token}}
+Content-Type: application/json
+
+{
+  "resourceName": "admin-panel"
+}
+
+###
+
+# Carlos → orders-api → 403 negado
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{loginCarlos.response.body.token}}
+Content-Type: application/json
+
+{
+  "resourceName": "orders-api"
+}
+
+### ─────────────────────────────────────────
+### 8. Logout
+### ─────────────────────────────────────────
+
+# Encerrar sessão da Ana
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{loginAna.response.body.token}}
+
+###
+
+# Encerrar sessão do Carlos
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{loginCarlos.response.body.token}}
+
+### ─────────────────────────────────────────
+### 9. Listar scopes e recursos
+### ─────────────────────────────────────────
+
+GET {{baseUrl}}/scope
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}
+
+###
+
+GET {{baseUrl}}/resource
+Authorization: Basic {{registrarCliente.response.body.clientId}} {{registrarCliente.response.body.clientSecret}}

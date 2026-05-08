@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export async function connect(uri) {
+export function connect(uri) {
   return new Promise((res, rej) => {
     console.log(`[DATABASE] connecting...`);
     mongoose

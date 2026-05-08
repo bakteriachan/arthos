@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ClientAuthorization } from "../middlewares/client-auth.middleware";
-import ScopesService from "./scopes.service";
+import { ClientAuthorization } from "../middlewares/client-auth.middleware.js";
+import ScopesService from "./scopes.service.js";
 
 const ScopeRouter = Router();
 

@@ -1,14 +1,12 @@
 import { BadRequestException } from "../shared/errors.js";
 import { ScopeModel } from "./scopes.schema.js";
+import { validateDto } from "../shared/util.js";
 
 export default {
   create: async function (dto) {
     if (!dto) throw new BadRequestException();
+    validateDto(dto, ['name', 'value', 'clientId']);
     const { name, value, clientId } = dto;
-
-    if (!name) throw new BadRequestException("Missing scope name");
-    if (!value) throw new BadRequestException("Missing scope value");
-    if (!clientId) throw new BadRequestException("Missing clientId");
 
     const entity = new ScopeModel({
       name,
@@ -20,15 +18,14 @@ export default {
     return entity;
   },
   getAllByClientId: async function (clientId, pagination) {
-    if (!clientId) throw new BadRequestException();
-    const pageSize = pagination.pageSize ?? 10;
-    const page = pagination.page ?? 0;
+    validateDto({ clientId }, ['clientId']);
+    const pageSize = Number(pagination.pageSize ?? 10);
+    const page = Number(pagination.page ?? 0);
 
     const entities = await ScopeModel.find(
       { clientId },
-      { skip: pageSize * page, limit: pageSize },
-    );
+    ).skip(pageSize * page).limit(pageSize);
 
-    return entities
+    return entities.map(e => e.toJSON())
   },
 };

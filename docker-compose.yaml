@@ -10,7 +10,12 @@ services:
       - ./:/app
     depends_on:
       - mongo
+      - redis
     command: ["npm", "run", "dev"]
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
   mongo:
     image: mongo:7.0
     environment:
